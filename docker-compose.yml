@@ -1,0 +1,54 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+version: '3.7'
+# Define services
+services:
+
+# Database Service - Redis
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - '6379:6379'
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - currency-exchange
+
+  # Database Service - CockroachDB
+  crdb:
+    image: cockroachdb/cockroach:latest
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    command: start-single-node --insecure
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - currency-exchange
+
+  # Commander e-commerce-api
+  e-commerce-api:
+    # Configuration for building the docker image for the backend service
+    build:
+      context: e-commerce-api
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    restart: always
+    depends_on: 
+      - crdb 
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - currency-exchange
+
+  # currency-exchange-api
+  currency-exchange-api:
+    # Configuration for building the docker image for the backend service
+    build:
+      context: currency-exchange-api
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    restart: always
+    depends_on: 
+      - redis 
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - currency-exchange
+      
+# Networks to be created to facilitate communication between containers
+networks:
+    currency-exchange:

@@ -1,0 +1,12 @@
+APP_NAME: e-commerce-api
+HTTP_PORT: "8081"
+COINS:
+  - USD
+  - EUR
+  - IND
+CRDB:
+  CRDB_HOST: crdb
+  CRDB_PORT: "26257"
+  CRDB_DATABASE: sbfcase_products
+  CRDB_USER: root
+  CRDB_PASS:
